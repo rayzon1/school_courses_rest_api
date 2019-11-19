@@ -4,6 +4,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const Sequelize = require('sequelize');
+const userRoutes = require('./routes/users');
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -14,6 +15,7 @@ const app = express();
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 app.use(express.json());
+app.use('api', userRoutes);
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
