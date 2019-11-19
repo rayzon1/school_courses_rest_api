@@ -15,7 +15,7 @@ const app = express();
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 app.use(express.json());
-app.use('api', userRoutes);
+app.use('/api', userRoutes);
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
