@@ -40,10 +40,10 @@ const authenticateUser = async (req, res, next) => {
         // Store the retrieved user object on the request object.
         req.currentCourse = course;
       } else {
-        message = `Authentication failure for username: ${user.emailAddress}`;
+        message = `Authentication failure for username: ${course.emailAddress}`;
       }
     } else {
-      message = `Authentication failure for username: ${user.emailAddress}`;
+      message = `Authentication failure for username: ${course.emailAddress}`;
     }
   } else {
     message = "Auth header not found";
@@ -96,10 +96,11 @@ router.post(
     check("title")
         .exists({ checkNull: true, checkFalsy: true })
         .withMessage('Please provide a value for title'),
-    check("title")
+    check("description")
         .exists({ checkNull: true, checkFalsy: true })
         .withMessage('Please provide a value for description.'),
   ],
+  authenticateUser,
   asyncHandler(async (req, res) => {
 
     // Validation errors sends 400 response.

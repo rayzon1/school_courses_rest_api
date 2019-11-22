@@ -1,19 +1,17 @@
-
+const User = require("../../models").User;
 const bcryptjs = require("bcryptjs");
 const auth = require("basic-auth");
 
-const authenticateUser = async (req, res, next, model) => {
+const authenticateUser = async (req, res, next) => {
     let message = null;
     // Parse the user's credentials from the Authorization header.
     const credentials = auth(req);
-  
     // If the user's credentials are available...
     if (credentials) {
-  
       // Attempt to retrieve the user from the data store
       // by their username (i.e. the user's "key"
       // from the Authorization header).
-      const users = await model.findAll();
+      const users = await User.findAll();
       const user = users.find(data => data.emailAddress === credentials.name);
       // If a user was successfully retrieved from the data store...
       if (user) {
