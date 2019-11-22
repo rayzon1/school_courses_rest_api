@@ -8,7 +8,7 @@
   "env": {
     "NODE_ENV": "development",
     "DB_ENABLE_LOGGING": "false",
-    "ENABLE_GLOBAL_ERROR_LOGGING": "false"
+    "ENABLE_GLOBAL_ERROR_LOGGING": "true"
   },
   "ext": "js"
 }
