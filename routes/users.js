@@ -24,22 +24,16 @@ router.get(
   "/users",
   authenticateUser,
   asyncHandler(async (req, res) => {
-    const users = await User.findAll();
+    const users = await User.findAll({
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
+    });
     res.status(200).json({
-      Users: users.map(user => {
-        return {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.emailAddress,
-          password: user.password
-        };
-      })
+      users
     });
   })
 );
 
-// Post route to create a user.
+// Post route to create a user, including express-validator validations.
 router.post(
   "/users",
   [
@@ -73,16 +67,19 @@ router.post(
       const errorMessages = errors.array().map(error => error.msg);
       return res.status(400).json({ error: errorMessages });
     }
-
+   
     try {
       const user = req.body;
       user.password = bcryptjs.hashSync(user.password);
       await User.create(req.body);
       res
-        .sendStatus(201);
+        .status(201)
+        .set('Location', '/')
+        .end()
     } catch (error) {
       res.json({ error: error.msg });
     }
+    
   })
 );
 

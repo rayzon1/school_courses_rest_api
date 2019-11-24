@@ -3,6 +3,7 @@
 const express = require("express");
 const router = express.Router();
 const Course = require("../models").Course;
+const User = require("../models").User;
 const { check, validationResult } = require("express-validator");
 const authenticateUser = require("./middleware/authentication");
 
@@ -21,7 +22,14 @@ function asyncHandler(cb) {
 router.get(
   "/courses",
   asyncHandler(async (req, res) => {
-    const courses = await Course.findAll({ include: ["user"] });
+    const courses = await Course.findAll({
+      include: {
+        model: User,
+        as: "user",
+        attributes: { exclude: ["password", "createdAt", "updatedAt"] }
+      },
+      attributes: { exclude: ["createdAt", "updatedAt"] }
+    });
     res.status(200).json(courses);
   })
 );
@@ -32,7 +40,12 @@ router.get(
   asyncHandler(async (req, res) => {
     try {
       const course = await Course.findByPk(req.params.id, {
-        include: ["user"]
+        include: {
+          model: User,
+          as: "user",
+          attributes: { exclude: ["password", "createdAt", "updatedAt"] }
+        },
+        attributes: { exclude: ["createdAt", "updatedAt"] }
       });
       if (course) {
         res.json(course);
@@ -45,7 +58,8 @@ router.get(
   })
 );
 
-// Post a new article and redirect to show added article.
+// Post a new article and set Location header to show added article.
+//! Authentication needed.
 router.post(
   "/courses",
   [
@@ -79,6 +93,7 @@ router.post(
 );
 
 // Update an article by id.
+//! Authentication needed.
 router.put(
   "/courses/:id",
   [
@@ -93,6 +108,13 @@ router.put(
   asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id);
 
+    //TODO: Compare req.currentUser.id (signed in user) with course id that is trying to be edited.
+
+    // Returns 403 Forbidden if the currentUser id does not match the course owners id.
+    if (req.currentUser.id !== course.userId) {
+      return res.sendStatus(403);
+    }
+
     // Validation errors sends 400 response.
     const errors = validationResult(req);
 
@@ -101,6 +123,7 @@ router.put(
       return res.status(400).json({ error: errorMessages });
     }
 
+    // If course available and passes validation/auth tests.
     if (course) {
       await course.update(req.body);
       res.sendStatus(204);
@@ -110,6 +133,8 @@ router.put(
   })
 );
 
+// Delete course by courseId.
+//! Authentication needed.
 router.delete(
   "/courses/:id",
   authenticateUser,

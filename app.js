@@ -3,7 +3,7 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
-const Sequelize = require('sequelize');
+const sequelize = require('./models').sequelize;
 const userRoutes = require('./routes/users');
 const courseRoutes = require('./routes/courses');
 
@@ -19,11 +19,7 @@ app.use(express.json());
 app.use('/api', userRoutes);
 app.use('/api', courseRoutes);
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: 'fsjstd-restapi.db'
-});
-
+// Initialize and authenticate database.
 sequelize
   .authenticate()
   .then(() => {
@@ -32,10 +28,6 @@ sequelize
   .catch(err => {
     console.error('Unable to connect to the database:', err);
   });
-
-
-// TODO setup your api routes here
-
 
 
 // setup a friendly greeting for the root route

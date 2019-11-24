@@ -6,11 +6,13 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    firstName: DataTypes.STRING,
+    firstName: {
+      type: DataTypes.STRING
+    },
     lastName: DataTypes.STRING,
     emailAddress: DataTypes.STRING,
     password: DataTypes.STRING
-  }, {});
+  }, { sequelize });
   User.associate = function(models) {
     User.hasMany(models.Course, {
       as: 'user',
