@@ -106,9 +106,8 @@ router.put(
   ],
   authenticateUser,
   asyncHandler(async (req, res) => {
+    // Find course by params id.
     const course = await Course.findByPk(req.params.id);
-
-    //TODO: Compare req.currentUser.id (signed in user) with course id that is trying to be edited.
 
     // Returns 403 Forbidden if the currentUser id does not match the course owners id.
     if (req.currentUser.id !== course.userId) {
@@ -139,12 +138,16 @@ router.delete(
   "/courses/:id",
   authenticateUser,
   asyncHandler(async (req, res) => {
+
     const course = await Course.findByPk(req.params.id);
-    if (course) {
+
+    if (req.currentUser.id !== course.userId){
+      return res.sendStatus(403);
+    } else if (course) {
       await course.destroy();
-      res.sendStatus(204);
+      return res.sendStatus(204);
     } else {
-      res.sendStatus(404);
+      return res.sendStatus(404);
     }
   })
 );
